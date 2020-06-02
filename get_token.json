@@ -1,0 +1,30 @@
+{
+    "puppet_task_version": 1,
+    "supports_noop": false,
+    "description": "Get a new set of ServiceNow oauth tokens.",
+    "files": ["ruby_task_helper/files/task_helper.rb", "servicenow_tasks/lib/service_now_request.rb"],
+    "remote": true,
+    "parameters": {
+        "user": {
+            "description": "ServiceNow username. Required when making a request with grant_type = password.",
+            "type": "String[1]"
+        },
+        "password": {
+            "description": "ServiceNow password. Required when making a request with grant_type = password.",
+            "type": "String[1]",
+            "sensitive": true
+        },
+        "instance": {
+            "description": "ServiceNow instance name. If your instance uri is https://dev84270.service-now.com your instance name would be dev84270.",
+            "type": "String[1]"
+        },
+        "client_id": {
+            "description": "ServiceNow oauth client id.",
+            "type": "String[1]"
+        },
+        "client_secret": {
+            "description": "ServiceNow oauth client secret.",
+            "type": "String[1]"
+        }
+    }
+}
