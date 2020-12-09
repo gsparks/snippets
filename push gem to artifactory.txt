@@ -1,0 +1,39 @@
+name: artifactory
+
+#on:
+# push:
+#  tags:
+#    - v[0-9]+.[0-9]+.[0-9]+
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  artifactory:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.5.3
+    - name: Update Rubygems
+      run: gem update --system 3.1.0
+    - name: Get latest tag
+      run: echo "RELEASE_VERSION=$(echo ${GITHUB_REF:10})" >> $GITHUB_ENV
+    - name: Clone Repository
+      uses: actions/checkout@v2
+      #with:
+      #  ref: ${{ env.RELEASE_VERSION }}
+    - name: Build and Push Gem
+      run: |
+        mkdir -p $HOME/.gem
+        touch $HOME/.gem/credentials
+        chmod 0600 $HOME/.gem/credentials
+        printf -- "---\n:github: Bearer ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
+        bundle config timeout 60
+        gem build *.gemspec
+        gem push --KEY github --host https://artifactory.delivery.puppetlabs.net/artifactory/api/gems/rubygems *.gem
+      env:
+        GEM_HOST_API_KEY: ${{ secrets.ARTIFACTORY_TOKEN }}
